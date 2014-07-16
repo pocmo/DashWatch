@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.androidzeitgeist.dashwatch.common.ExtensionUpdate;
 import com.androidzeitgeist.dashwatch.dashclock.ExtensionManager;
 import com.androidzeitgeist.dashwatch.common.Constants;
 import com.google.android.gms.common.ConnectionResult;
@@ -58,22 +59,22 @@ public class WearableManager implements GoogleApiClient.ConnectionCallbacks, Goo
             title = extension.latestData.status();
         }
 
+        ExtensionUpdate update = new ExtensionUpdate();
+        update.setTitle(title);
+        update.setContent(extension.latestData.expandedBody());
+        update.setComponent(extension.listing.componentName.flattenToString());
+
         if (mGoogleApiClient.isConnected()) {
-            buildWearableOnlyNotification(
-                    title,
-                    extension.latestData.expandedBody(),
-                    extension.hashCode(),
-                    Constants.PATH_NOTIFICATION
-            );
+            sendToWearable(update);
         }
     }
 
-    private void buildWearableOnlyNotification(String title, String content, int id,  String path) {
+    private void sendToWearable(ExtensionUpdate update) {
         if (mGoogleApiClient.isConnected()) {
-            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(path);
-            putDataMapRequest.getDataMap().putString(Constants.KEY_CONTENT, content);
-            putDataMapRequest.getDataMap().putString(Constants.KEY_TITLE, title);
-            putDataMapRequest.getDataMap().putInt(Constants.KEY_NOTIFICATION_ID, id);
+            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Constants.PATH_EXTENSION_UPDATE);
+
+            update.writeToDataMap(putDataMapRequest.getDataMap());
+
             PutDataRequest request = putDataMapRequest.asPutDataRequest();
             Wearable.DataApi.putDataItem(mGoogleApiClient, request)
                     .setResultCallback(new ResultCallback<DataApi.DataItemResult>() {

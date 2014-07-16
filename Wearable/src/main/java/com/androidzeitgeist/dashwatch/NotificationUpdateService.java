@@ -19,35 +19,25 @@ package com.androidzeitgeist.dashwatch;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
 import android.util.Log;
 
-import com.androidzeitgeist.dashwatch.common.Constants;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.androidzeitgeist.dashwatch.common.ExtensionUpdate;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
-public class NotificationUpdateService extends WearableListenerService
-implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-
+public class NotificationUpdateService extends WearableListenerService {
     private static final String TAG = "NotificationUpdate";
-    private GoogleApiClient mGoogleApiClient;
+
+    private ExtensionDataStorage storage;
 
     @Override
     public void onCreate() {
-        Log.d(TAG, "onCreate()");
-
         super.onCreate();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+
+        storage = new ExtensionDataStorage(this);
     }
 
     @Override
@@ -57,35 +47,24 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
         for (DataEvent dataEvent : dataEvents) {
             if (dataEvent.getType() == DataEvent.TYPE_CHANGED) {
                 DataMap dataMap = DataMapItem.fromDataItem(dataEvent.getDataItem()).getDataMap();
-                String content = dataMap.getString(Constants.KEY_CONTENT);
-                String title = dataMap.getString(Constants.KEY_TITLE);
-                int id = dataMap.getInt(Constants.KEY_NOTIFICATION_ID);
 
-                buildNotification(title, content, id);
+                ExtensionUpdate update = ExtensionUpdate.fromDataMap(dataMap);
+                buildNotification(update);
             }
         }
     }
 
-    private void buildNotification(String title, String content, int id) {
+    private void buildNotification(ExtensionUpdate update) {
+        int id = storage.getNotificationId(update);
+
+        Log.d(TAG, String.format("Building notification for component %s with id %d", update.getComponent(), id));
+
         Notification.Builder builder = new Notification.Builder(this)
                 .setSmallIcon(com.androidzeitgeist.dashwatch.R.drawable.ic_launcher)
-                .setContentTitle(title)
-                .setContentText(content)
+                .setContentTitle(update.getTitle())
+                .setContentText(update.getContent())
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_background));
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(id, builder.build());
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.d(TAG, "onConnected()");
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
     }
 }

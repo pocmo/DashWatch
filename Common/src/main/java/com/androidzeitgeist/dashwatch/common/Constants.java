@@ -22,9 +22,5 @@ package com.androidzeitgeist.dashwatch.common;
 public final class Constants {
     private Constants() {};
 
-    public static final String PATH_NOTIFICATION = "/notification";
-
-    public static final String KEY_NOTIFICATION_ID = "notification-id";
-    public static final String KEY_TITLE = "title";
-    public static final String KEY_CONTENT = "content";
+    public static final String PATH_EXTENSION_UPDATE = "/extension/update";
 }
