@@ -18,6 +18,7 @@ package com.androidzeitgeist.dashwatch;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -69,7 +70,8 @@ implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFail
         Notification.Builder builder = new Notification.Builder(this)
                 .setSmallIcon(com.androidzeitgeist.dashwatch.R.drawable.ic_launcher)
                 .setContentTitle(title)
-                .setContentText(content);
+                .setContentText(content)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_background));
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(id, builder.build());
     }
