@@ -49,7 +49,12 @@ public class NotificationUpdateService extends WearableListenerService {
                 DataMap dataMap = DataMapItem.fromDataItem(dataEvent.getDataItem()).getDataMap();
 
                 ExtensionUpdate update = ExtensionUpdate.fromDataMap(dataMap);
-                buildNotification(update);
+
+                if (storage.isNew(update)) {
+                    buildNotification(update);
+                } else {
+                    Log.d(TAG, String.format("Notification of component %s is not new. Ignoring.", update.getComponent()));
+                }
             }
         }
     }
@@ -62,7 +67,7 @@ public class NotificationUpdateService extends WearableListenerService {
         Notification.Builder builder = new Notification.Builder(this)
                 .setSmallIcon(com.androidzeitgeist.dashwatch.R.drawable.ic_launcher)
                 .setContentTitle(update.getTitle())
-                .setContentText(update.getContent())
+                .setContentText(update.getText())
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_background));
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(id, builder.build());

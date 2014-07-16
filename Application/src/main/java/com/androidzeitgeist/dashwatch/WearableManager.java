@@ -61,7 +61,7 @@ public class WearableManager implements GoogleApiClient.ConnectionCallbacks, Goo
 
         ExtensionUpdate update = new ExtensionUpdate();
         update.setTitle(title);
-        update.setContent(extension.latestData.expandedBody());
+        update.setText(extension.latestData.expandedBody());
         update.setComponent(extension.listing.componentName.flattenToString());
 
         if (mGoogleApiClient.isConnected()) {

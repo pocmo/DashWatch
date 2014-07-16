@@ -26,6 +26,7 @@ public class ExtensionDataStorage {
 
     private static final String KEY_NEXT_EXTENSION_ID = "next_extension_id";
     private static final String KEY_SUFFIX_NOTIFICATION_ID = "notification_id";
+    private static final String KEY_SUFFIX_EXTENSION_HASH = "hash";
 
     private SharedPreferences preferences;
     private int nextExtensionId;
@@ -50,6 +51,20 @@ public class ExtensionDataStorage {
         }
 
         return nextExtensionId;
+    }
+
+    public synchronized boolean isNew(ExtensionUpdate update) {
+        String key = createKey(update, KEY_SUFFIX_EXTENSION_HASH);
+
+        String contentHash = update.getContentHash();
+        String lastKnownHash = preferences.getString(key, null);
+
+        if (lastKnownHash == null || !contentHash.equals(lastKnownHash)) {
+            preferences.edit().putString(key, contentHash).apply();
+            return true;
+        }
+
+        return false;
     }
 
     private static String createKey(ExtensionUpdate update, String keySuffix) {

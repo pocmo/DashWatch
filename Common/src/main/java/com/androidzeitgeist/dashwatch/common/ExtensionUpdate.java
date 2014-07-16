@@ -20,18 +20,18 @@ import com.google.android.gms.wearable.DataMap;
 
 public class ExtensionUpdate {
     private static final String KEY_TITLE = "title";
-    private static final String KEY_CONTENT = "content";
+    private static final String KEY_TEXT = "text";
     private static final String KEY_COMPONENT = "component";
 
     private String title;
-    private String content;
+    private String text;
     private String component;
 
     public static ExtensionUpdate fromDataMap(DataMap dataMap) {
         ExtensionUpdate update = new ExtensionUpdate();
 
         update.setTitle(dataMap.getString(KEY_TITLE));
-        update.setContent(dataMap.getString(KEY_CONTENT));
+        update.setText(dataMap.getString(KEY_TEXT));
         update.setComponent(dataMap.getString(KEY_COMPONENT));
 
         return update;
@@ -39,8 +39,17 @@ public class ExtensionUpdate {
 
     public void writeToDataMap(DataMap dataMap) {
         dataMap.putString(KEY_TITLE, title);
-        dataMap.putString(KEY_CONTENT, content);
+        dataMap.putString(KEY_TEXT, text);
         dataMap.putString(KEY_COMPONENT, component);
+    }
+
+    public String getContentHash() {
+        return Hash.sha1(String.format(
+            "%s-%s-%s",
+            title,
+            text,
+            component
+        ));
     }
 
     public void setTitle(String title) {
@@ -51,12 +60,12 @@ public class ExtensionUpdate {
         return title;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setText(String content) {
+        this.text = content;
     }
 
-    public String getContent() {
-        return content;
+    public String getText() {
+        return text;
     }
 
     public void setComponent(String component) {
