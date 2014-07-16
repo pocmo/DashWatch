@@ -17,6 +17,7 @@
                     android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
+        <service android:name=".MessageSenderService" />
     </application>
 
 </manifest>

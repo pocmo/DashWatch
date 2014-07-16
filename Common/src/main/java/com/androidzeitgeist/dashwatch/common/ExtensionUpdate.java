@@ -16,16 +16,25 @@
 
 package com.androidzeitgeist.dashwatch.common;
 
+import android.content.Intent;
+import android.util.Log;
+
 import com.google.android.gms.wearable.DataMap;
 
+import java.net.URISyntaxException;
+
 public class ExtensionUpdate {
+    private static final String TAG = "ExtensionUpdate";
+
     private static final String KEY_TITLE = "title";
     private static final String KEY_TEXT = "text";
     private static final String KEY_COMPONENT = "component";
+    private static final String KEY_INTENT = "intent";
 
     private String title;
     private String text;
     private String component;
+    private Intent intent;
 
     public static ExtensionUpdate fromDataMap(DataMap dataMap) {
         ExtensionUpdate update = new ExtensionUpdate();
@@ -34,6 +43,14 @@ public class ExtensionUpdate {
         update.setText(dataMap.getString(KEY_TEXT));
         update.setComponent(dataMap.getString(KEY_COMPONENT));
 
+        if (dataMap.containsKey(KEY_INTENT)) {
+            try {
+                update.setIntent(Intent.parseUri(dataMap.getString(KEY_INTENT), 0));
+            } catch (URISyntaxException e) {
+                Log.w(TAG, "Unable to parse intent uri", e);
+            }
+        }
+
         return update;
     }
 
@@ -41,14 +58,19 @@ public class ExtensionUpdate {
         dataMap.putString(KEY_TITLE, title);
         dataMap.putString(KEY_TEXT, text);
         dataMap.putString(KEY_COMPONENT, component);
+
+        if (hasIntent()) {
+            dataMap.putString(KEY_INTENT, intent.toUri(0));
+        }
     }
 
     public String getContentHash() {
         return Hash.sha1(String.format(
-            "%s-%s-%s",
+            "%s-%s-%s-%s",
             title,
             text,
-            component
+            component,
+            intent != null ? intent.toUri(0) : ""
         ));
     }
 
@@ -74,5 +96,17 @@ public class ExtensionUpdate {
 
     public String getComponent() {
         return component;
+    }
+
+    public void setIntent(Intent intent) {
+        this.intent = intent;
+    }
+
+    public Intent getIntent() {
+        return intent;
+    }
+
+    public boolean hasIntent() {
+        return intent != null;
     }
 }

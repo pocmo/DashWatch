@@ -23,4 +23,8 @@ public final class Constants {
     private Constants() {};
 
     public static final String PATH_EXTENSION_UPDATE = "/extension/update";
+
+    public static final String PATH_INTENT = "/intent";
+
+    public static final String EXTRA_INTENT_URI = "intentUri";
 }

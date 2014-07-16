@@ -18,14 +18,18 @@ package com.androidzeitgeist.dashwatch;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.androidzeitgeist.dashwatch.common.Constants;
 import com.androidzeitgeist.dashwatch.common.ExtensionUpdate;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
 public class NotificationUpdateService extends WearableListenerService {
@@ -41,6 +45,11 @@ public class NotificationUpdateService extends WearableListenerService {
     }
 
     @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        super.onMessageReceived(messageEvent);
+    }
+
+    @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
         Log.d(TAG, "onDataChanged()");
 
@@ -49,6 +58,12 @@ public class NotificationUpdateService extends WearableListenerService {
                 DataMap dataMap = DataMapItem.fromDataItem(dataEvent.getDataItem()).getDataMap();
 
                 ExtensionUpdate update = ExtensionUpdate.fromDataMap(dataMap);
+
+                if (update.hasIntent()) {
+                    Log.d(TAG, "Intent received: " + update.getIntent().toUri(0));
+                } else {
+                    Log.d(TAG, "Update does not contain any intent");
+                }
 
                 if (storage.isNew(update)) {
                     buildNotification(update);
@@ -69,6 +84,15 @@ public class NotificationUpdateService extends WearableListenerService {
                 .setContentTitle(update.getTitle())
                 .setContentText(update.getText())
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_background));
+
+        if (update.hasIntent()) {
+            Intent intent = new Intent(this, MessageSenderService.class);
+            intent.putExtra(Constants.EXTRA_INTENT_URI, update.getIntent().toUri(0));
+
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+
+            builder.setContentIntent(pendingIntent);
+        }
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(id, builder.build());
     }
