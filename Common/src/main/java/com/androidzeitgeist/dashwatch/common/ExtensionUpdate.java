@@ -61,6 +61,8 @@ public class ExtensionUpdate {
 
         if (hasIntent()) {
             dataMap.putString(KEY_INTENT, intent.toUri(0));
+        } else {
+            dataMap.remove(KEY_INTENT);
         }
     }
 
