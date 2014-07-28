@@ -45,6 +45,19 @@ public class NotificationUpdateService extends WearableListenerService {
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (null != intent) {
+            String action = intent.getAction();
+            if (Constants.ACTION_DISMISS.equals(action)) {
+                String extensionComponent = intent.getExtras().getString(Constants.EXTRA_EXTENSION_COMPONENT);
+                storage.shutUpNotification(extensionComponent);
+            }
+        }
+
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         super.onMessageReceived(messageEvent);
     }
@@ -65,11 +78,17 @@ public class NotificationUpdateService extends WearableListenerService {
                     Log.d(TAG, "Update does not contain any intent");
                 }
 
-                if (storage.isNew(update)) {
-                    buildNotification(update);
-                } else {
+                if (!storage.isNew(update)) {
                     Log.d(TAG, String.format("Notification of component %s is not new. Ignoring.", update.getComponent()));
+                    continue;
                 }
+
+                if (storage.shouldShutUp(update)) {
+                    Log.d(TAG, String.format("Notification of component %s should shut up. Ignoring.", update.getComponent()));
+                    continue;
+                }
+
+                buildNotification(update);
             }
         }
     }
@@ -93,6 +112,11 @@ public class NotificationUpdateService extends WearableListenerService {
 
             builder.setContentIntent(pendingIntent);
         }
+
+        Intent dismissIntent = new Intent(Constants.ACTION_DISMISS);
+        dismissIntent.putExtra(Constants.EXTRA_EXTENSION_COMPONENT, update.getComponent());
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setDeleteIntent(pendingIntent);
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(id, builder.build());
     }

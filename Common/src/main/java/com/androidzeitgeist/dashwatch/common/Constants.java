@@ -27,4 +27,9 @@ public final class Constants {
     public static final String PATH_INTENT = "/intent";
 
     public static final String EXTRA_INTENT_URI = "intentUri";
+    public static final String EXTRA_EXTENSION_COMPONENT = "extension_component";
+
+    public static final String ACTION_DISMISS = "com.androidzeitgeist.dashwatch.notification.DISMISS";
+
+
 }

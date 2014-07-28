@@ -18,15 +18,21 @@ package com.androidzeitgeist.dashwatch;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.androidzeitgeist.dashwatch.common.ExtensionUpdate;
 
 public class ExtensionDataStorage {
+    private static final String TAG = "DashWatch/ExtensionDataStorage";
+
     private static final String PREFERENCE_NAME = "extension_data";
 
     private static final String KEY_NEXT_EXTENSION_ID = "next_extension_id";
     private static final String KEY_SUFFIX_NOTIFICATION_ID = "notification_id";
     private static final String KEY_SUFFIX_EXTENSION_HASH = "hash";
+    private static final String KEY_SILENT_SINCE = "silent_since";
+
+    private static final int SILENCE_PERIOD = 1000 * 60 * 60 * 12;
 
     private SharedPreferences preferences;
     private int nextExtensionId;
@@ -67,7 +73,30 @@ public class ExtensionDataStorage {
         return false;
     }
 
+    public synchronized void shutUpNotification(String notificationComponent) {
+        String key = createKey(notificationComponent, KEY_SILENT_SINCE);
+
+        long now = System.currentTimeMillis();
+        long silentUntil = SILENCE_PERIOD + now;
+
+        Log.d(TAG, String.format("Extension %s should shut up at least until %d", notificationComponent, silentUntil));
+
+        preferences.edit()
+            .putLong(key, now)
+            .apply();
+    }
+
+    public synchronized boolean shouldShutUp(ExtensionUpdate update) {
+        long silentSince = preferences.getLong(createKey(update, KEY_SILENT_SINCE), 0);
+
+        return silentSince != 0 && System.currentTimeMillis() < silentSince + SILENCE_PERIOD;
+    }
+
     private static String createKey(ExtensionUpdate update, String keySuffix) {
-        return String.format("%s-%s", update.getComponent(), keySuffix);
+        return createKey(update.getComponent(), keySuffix);
+    }
+
+    private static String createKey(String extensionComponent, String keySuffix) {
+        return String.format("%s-%s", extensionComponent, keySuffix);
     }
 }
