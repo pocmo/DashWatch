@@ -35,6 +35,9 @@ import com.google.android.gms.wearable.WearableListenerService;
 public class NotificationUpdateService extends WearableListenerService {
     private static final String TAG = "NotificationUpdate";
 
+    private static int REQUEST_CODE_INTENT  = 10000000;
+    private static int REQUEST_CODE_DISMISS = 50000000;
+
     private ExtensionDataStorage storage;
 
     @Override
@@ -108,14 +111,26 @@ public class NotificationUpdateService extends WearableListenerService {
             Intent intent = new Intent(this, MessageSenderService.class);
             intent.putExtra(Constants.EXTRA_INTENT_URI, update.getIntent().toUri(0));
 
-            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+            Log.i(TAG, String.format("Notification %s with intent: %s", update.getComponent(), update.getIntent().toUri(0)));
+
+            PendingIntent pendingIntent = PendingIntent.getService(
+                this,
+                REQUEST_CODE_INTENT + id,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            );
 
             builder.setContentIntent(pendingIntent);
         }
 
         Intent dismissIntent = new Intent(Constants.ACTION_DISMISS);
         dismissIntent.putExtra(Constants.EXTRA_EXTENSION_COMPONENT, update.getComponent());
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getService(
+            this,
+            REQUEST_CODE_DISMISS + id,
+            dismissIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        );
         builder.setDeleteIntent(pendingIntent);
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(id, builder.build());
