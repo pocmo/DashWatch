@@ -23,7 +23,12 @@ android {
 dependencies {
     compile 'com.google.android.gms:play-services:5.0.+@aar'
     compile 'com.android.support:support-v13:20.0.+'
+
     compile files('libs/dashclock-api-r2.0.jar')
+    compile files("libs/muzei-api-1.0.jar")
+
+    compile 'com.squareup.okhttp:okhttp:1.2.1'
+
     compile project(':Common')
     wearApp project(':Wearable')
 }

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <ImageView
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/notification_background" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#55000000"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:fontFamily="sans-serif-condensed"
+            android:gravity="right"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:text="23:02"
+            android:textColor="#ffffff"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:gravity="right"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:text="Monday, July 28"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/icon1"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginRight="2dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/status1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
+                android:shadowColor="#000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:textColor="#ffffff"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/icon2"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginRight="2dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/status2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
+                android:shadowColor="#000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:textColor="#ffffff"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/icon3"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginRight="2dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/status3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:shadowColor="#000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:textColor="#ffffff"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</FrameLayout>

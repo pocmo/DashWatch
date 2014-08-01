@@ -38,17 +38,10 @@ public class DashWatchService extends Service implements ExtensionManager.OnChan
     private Handler mUpdateHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            Log.i(TAG, "EXTENSIONS HAVE CHANGED!");
+            Log.i(TAG, "Extensions changed: " + (msg.obj != null ? "extension " + msg.obj : "DashClock"));
 
-            Log.w(TAG, "Extension changed: " + (msg.obj != null ? "extension " + msg.obj : "DashClock"));
-
-            List<ExtensionManager.ExtensionWithData> extensions = mExtensionManager.getVisibleExtensionsWithData();
-
-            Log.d(TAG, "Active and visible extensions with data: " + extensions.size());
-
-            for (ExtensionManager.ExtensionWithData extension : extensions) {
-                mWearableManager.updateExtensionNotification(extension);
-            }
+            // TODO: Replace this with sending just the extension data of the updated extension?
+            mWearableManager.sendExtensionDataToWearable();
         }
     };
 
@@ -66,8 +59,7 @@ public class DashWatchService extends Service implements ExtensionManager.OnChan
         super.onCreate();
         Log.d(TAG, "onCreate");
 
-        mWearableManager = new WearableManager(this);
-        mWearableManager.connect();
+        mWearableManager = WearableManager.getInstance(this);
 
         mExtensionManager = ExtensionManager.getInstance(this);
         mExtensionManager.addOnChangeListener(this);
@@ -78,8 +70,6 @@ public class DashWatchService extends Service implements ExtensionManager.OnChan
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
-
-        mWearableManager.disconnect();
 
         mUpdateHandler.removeCallbacksAndMessages(null);
         mExtensionManager.removeOnChangeListener(this);

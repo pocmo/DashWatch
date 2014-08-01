@@ -19,13 +19,55 @@ package com.androidzeitgeist.dashwatch;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+
+import com.androidzeitgeist.dashwatch.muzei.SourceManager;
+
+import java.util.List;
+
+import javax.xml.transform.Source;
 
 public class MainActivity extends Activity {
+    private static final String TAG = "DashWatch/MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(com.androidzeitgeist.dashwatch.R.layout.activity_main);
 
+        selectDefaultSource();
+        subscribeToExtensions();
+    }
+
+    private void selectDefaultSource() {
+        SourceManager sourceManager = SourceManager.getInstance(this);
+        List<SourceManager.SourceListing> availableSources = sourceManager.getAvailableSources();
+
+        SourceManager.SourceListing source = null;
+
+        for (SourceManager.SourceListing listing : availableSources) {
+            Log.d(TAG, "Source: " + listing.title + " (" + listing.componentName + ")");
+
+            // TODO: I like space pictures *hack*
+            if (listing.title.contains("Nasa")) {
+                source = listing;
+            }
+        }
+
+        if (source == null && availableSources.size() > 0) {
+            source = availableSources.get(0);
+        }
+
+        if (source != null) {
+            Log.d(TAG, "Selecting and subscribing to source: " + source.title);
+
+            sourceManager.selectSource(source.componentName);
+            sourceManager.subscribeToSelectedSource();
+        }
+    }
+
+    private void subscribeToExtensions() {
         Intent intent = new Intent(this, DashWatchService.class);
         startService(intent);
     }

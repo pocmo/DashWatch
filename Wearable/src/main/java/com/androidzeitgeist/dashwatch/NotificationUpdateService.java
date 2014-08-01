@@ -20,16 +20,23 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.androidzeitgeist.dashwatch.common.AssetHelper;
 import com.androidzeitgeist.dashwatch.common.Constants;
 import com.androidzeitgeist.dashwatch.common.ExtensionUpdate;
+import com.androidzeitgeist.dashwatch.event.ArtworkUpdate;
+import com.androidzeitgeist.dashwatch.event.BusProvider;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
 public class NotificationUpdateService extends WearableListenerService {
@@ -38,13 +45,14 @@ public class NotificationUpdateService extends WearableListenerService {
     private static int REQUEST_CODE_INTENT  = 10000000;
     private static int REQUEST_CODE_DISMISS = 50000000;
 
-    private ExtensionDataStorage storage;
+    private GoogleApiClient mGoogleApiClient;
+    private ExtensionDataStorage mStorage;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        storage = new ExtensionDataStorage(this);
+        mStorage = new ExtensionDataStorage(this);
     }
 
     @Override
@@ -53,7 +61,7 @@ public class NotificationUpdateService extends WearableListenerService {
             String action = intent.getAction();
             if (Constants.ACTION_DISMISS.equals(action)) {
                 String extensionComponent = intent.getExtras().getString(Constants.EXTRA_EXTENSION_COMPONENT);
-                storage.shutUpNotification(extensionComponent);
+                mStorage.shutUpNotification(extensionComponent);
             }
         }
 
@@ -71,33 +79,60 @@ public class NotificationUpdateService extends WearableListenerService {
 
         for (DataEvent dataEvent : dataEvents) {
             if (dataEvent.getType() == DataEvent.TYPE_CHANGED) {
-                DataMap dataMap = DataMapItem.fromDataItem(dataEvent.getDataItem()).getDataMap();
+                DataItem item = dataEvent.getDataItem();
+                String path = item.getUri().getPath();
 
-                ExtensionUpdate update = ExtensionUpdate.fromDataMap(dataMap);
+                Log.d(TAG, "Received: " + path);
 
-                if (update.hasIntent()) {
-                    Log.d(TAG, "Intent received: " + update.getIntent().toUri(0));
-                } else {
-                    Log.d(TAG, "Update does not contain any intent");
+                if (Constants.PATH_EXTENSION_UPDATE.equals(path)) {
+                    updateNotification(item);
+                } else if (Constants.PATH_ARTWORK_UDPATE.equals(path)) {
+                    updateArtwork(item);
                 }
-
-                if (!storage.isNew(update)) {
-                    Log.d(TAG, String.format("Notification of component %s is not new. Ignoring.", update.getComponent()));
-                    continue;
-                }
-
-                if (storage.shouldShutUp(update)) {
-                    Log.d(TAG, String.format("Notification of component %s should shut up. Ignoring.", update.getComponent()));
-                    continue;
-                }
-
-                buildNotification(update);
             }
         }
     }
 
+    private void updateNotification(DataItem dataItem) {
+        Log.i(TAG, "updateNotification()");
+
+        DataMap dataMap = DataMapItem.fromDataItem(dataItem).getDataMap();
+
+        ExtensionUpdate update = ExtensionUpdate.fromDataMap(this, dataMap);
+
+        BusProvider.postOnMainThread(update);
+
+        if (update.hasIntent()) {
+            Log.d(TAG, "Intent received: " + update.getIntent().toUri(0));
+        } else {
+            Log.d(TAG, "Update does not contain any intent");
+        }
+
+        if (!mStorage.isNew(update)) {
+            Log.d(TAG, String.format("Notification of component %s is not new. Ignoring.", update.getComponent()));
+            return;
+        }
+
+        if (mStorage.shouldShutUp(update)) {
+            Log.d(TAG, String.format("Notification of component %s should shut up. Ignoring.", update.getComponent()));
+            return;
+        }
+
+        buildNotification(update);
+    }
+
+    private void updateArtwork(DataItem dataItem) {
+        Log.i(TAG, "updateArtwork()");
+
+        DataMap dataMap = DataMapItem.fromDataItem(dataItem).getDataMap();
+
+        Bitmap bitmap = AssetHelper.loadBitmapFromAsset(this, dataMap.getAsset(Constants.KEY_ARTWORK_ASSET));
+
+        BusProvider.postOnMainThread(new ArtworkUpdate(bitmap));
+    }
+
     private void buildNotification(ExtensionUpdate update) {
-        int id = storage.getNotificationId(update);
+        int id = mStorage.getNotificationId(update);
 
         Log.d(TAG, String.format("Building notification for component %s with id %d", update.getComponent(), id));
 

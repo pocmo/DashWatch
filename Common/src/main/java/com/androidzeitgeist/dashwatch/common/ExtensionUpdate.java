@@ -16,9 +16,12 @@
 
 package com.androidzeitgeist.dashwatch.common;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataMap;
 
 import java.net.URISyntaxException;
@@ -26,22 +29,37 @@ import java.net.URISyntaxException;
 public class ExtensionUpdate {
     private static final String TAG = "ExtensionUpdate";
 
+    private static final String KEY_POSITION = "position";
     private static final String KEY_TITLE = "title";
     private static final String KEY_TEXT = "text";
     private static final String KEY_COMPONENT = "component";
     private static final String KEY_INTENT = "intent";
+    private static final String KEY_STATUS = "status";
+    private static final String KEY_VISIBLE = "visible";
+    private static final String KEY_ICON = "icon";
 
+    private int position;
     private String title;
     private String text;
     private String component;
     private Intent intent;
+    private String status;
+    private boolean visible;
+    private Bitmap icon;
 
-    public static ExtensionUpdate fromDataMap(DataMap dataMap) {
+    public static ExtensionUpdate fromDataMap(Context context, DataMap dataMap) {
         ExtensionUpdate update = new ExtensionUpdate();
 
+        update.setPosition(dataMap.getInt(KEY_POSITION));
         update.setTitle(dataMap.getString(KEY_TITLE));
         update.setText(dataMap.getString(KEY_TEXT));
         update.setComponent(dataMap.getString(KEY_COMPONENT));
+        update.setStatus(dataMap.getString(KEY_STATUS));
+        update.setVisible(dataMap.getBoolean(KEY_VISIBLE));
+
+        if (dataMap.containsKey(KEY_ICON)) {
+            update.setIcon(AssetHelper.loadBitmapFromAsset(context, dataMap.getAsset(KEY_ICON)));
+        }
 
         if (dataMap.containsKey(KEY_INTENT)) {
             try {
@@ -55,9 +73,18 @@ public class ExtensionUpdate {
     }
 
     public void writeToDataMap(DataMap dataMap) {
+        dataMap.putInt(KEY_POSITION, position);
         dataMap.putString(KEY_TITLE, title);
         dataMap.putString(KEY_TEXT, text);
         dataMap.putString(KEY_COMPONENT, component);
+        dataMap.putString(KEY_STATUS, status);
+        dataMap.putBoolean(KEY_VISIBLE, visible);
+
+        if (icon != null) {
+            dataMap.putAsset(KEY_ICON, AssetHelper.createAssetFromBitmap(icon));
+        } else {
+            dataMap.remove(KEY_ICON);
+        }
 
         if (hasIntent()) {
             dataMap.putString(KEY_INTENT, intent.toUri(0));
@@ -110,5 +137,37 @@ public class ExtensionUpdate {
 
     public boolean hasIntent() {
         return intent != null;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setIcon(Bitmap icon) {
+        this.icon = icon;
+    }
+
+    public Bitmap getIcon() {
+        return icon;
     }
 }

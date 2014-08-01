@@ -21,6 +21,8 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.androidzeitgeist.dashwatch.common.Constants;
+import com.androidzeitgeist.dashwatch.dashclock.ExtensionManager;
+import com.androidzeitgeist.dashwatch.muzei.SourceManager;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
@@ -30,12 +32,24 @@ import java.net.URISyntaxException;
 public class MessageReceiverService extends WearableListenerService {
     private static final String TAG = "MessageReceiverService";
 
+    private SourceManager mSourceManager;
+    private ExtensionManager mExtensionManager;
+    private WearableManager mWearableManager;
+
+    public MessageReceiverService() {
+        mSourceManager = SourceManager.getInstance(this);
+        mExtensionManager = ExtensionManager.getInstance(this);
+        mWearableManager = WearableManager.getInstance(this);
+    }
+
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.i(TAG, String.format("onMessageReceived(): %s", messageEvent.getPath()));
 
         if (Constants.PATH_INTENT.equals(messageEvent.getPath())) {
             fireIntent(messageEvent.getData());
+        } else if (Constants.PATH_SETUP.equals(messageEvent.getPath())) {
+            setupWatchFace();
         }
     }
 
@@ -53,5 +67,12 @@ public class MessageReceiverService extends WearableListenerService {
         } catch (ActivityNotFoundException e) {
             Log.w(TAG, "Activity could not be found", e);
         }
+    }
+
+    private void setupWatchFace() {
+        Log.i(TAG, "setupWatchFace()");
+
+        mWearableManager.sendExtensionDataToWearable();
+        mWearableManager.sendArtworkToWearable();
     }
 }

@@ -32,20 +32,19 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
-public class MessageSenderService extends IntentService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MessageSenderService extends IntentService {
     private static final String TAG = "MessageSenderService";
 
-    private GoogleApiClient mGoogleApiClient;
-
-    private List<Intent> intentQueue;
+    private NodeManager mNodeManager;
 
     public MessageSenderService() {
         super(TAG);
 
-        intentQueue = new LinkedList<Intent>();
+        mNodeManager = NodeManager.getsInstance(this);
     }
 
     @Override
@@ -53,80 +52,20 @@ public class MessageSenderService extends IntentService implements GoogleApiClie
         super.onCreate();
 
         Log.d(TAG, "onCreate()");
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-        mGoogleApiClient.connect();
     }
 
     @Override
     protected synchronized void onHandleIntent(Intent intent) {
         Log.d(TAG, "onHandleIntent()");
 
-        if (mGoogleApiClient.isConnected()) {
-            sendMessageInBackground(intent);
-
-        } else {
-            intentQueue.add(intent);
-        }
-    }
-
-    private void sendMessageInBackground(final Intent intent) {
-        new Thread() {
-            public void run() {
-                sendMessageBlocking(intent);
-            }
-        }.start();
-    }
-
-    private void sendMessageBlocking(Intent intent) {
         String intentUri = intent.getStringExtra(Constants.EXTRA_INTENT_URI);
 
-        Log.d(TAG, String.format("Sending message for intent: %s", intentUri));
-
-        List<Node> nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await().getNodes();
-        Log.d(TAG, "Connected nodes: " + nodes);
-
-        for (Node node : nodes) {
-            Log.d(TAG, String.format("Sending message to node %s", node.getId()));
-
-            try {
-                PendingResult<MessageApi.SendMessageResult> pendingResult = Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(), Constants.PATH_INTENT, intentUri.getBytes("UTF-8"));
-                pendingResult.setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
-                    @Override
-                    public void onResult(MessageApi.SendMessageResult sendMessageResult) {
-                        Log.d(TAG, String.format("onResult(): requestedId=%d", sendMessageResult.getRequestId()));
-                    }
-                });
-            } catch (UnsupportedEncodingException e) {
-                Log.w(TAG, "This device has no clue what UTF-8 is..");
-            }
+        try {
+            mNodeManager.sendIntentMessage(intentUri).get();
+        } catch (InterruptedException e) {
+            Log.w(TAG, "Sending intent has been interrupted", e);
+        } catch (ExecutionException e) {
+            Log.w(TAG, "Sending intent caused an exception", e);
         }
-    }
-
-    @Override
-    public synchronized void onConnected(Bundle bundle) {
-        Log.i(TAG, "onConnected()");
-
-        Iterator<Intent> iterator = intentQueue.iterator();
-        while (iterator.hasNext()) {
-            sendMessageInBackground(iterator.next());
-
-            iterator.remove();
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.i(TAG, "onConnectionSuspended()");
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.i(TAG, "onConnectionFailed()");
     }
 }

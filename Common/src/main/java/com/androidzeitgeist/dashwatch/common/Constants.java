@@ -23,13 +23,15 @@ public final class Constants {
     private Constants() {};
 
     public static final String PATH_EXTENSION_UPDATE = "/extension/update";
+    public static final String PATH_ARTWORK_UDPATE = "/artwork/update";
 
     public static final String PATH_INTENT = "/intent";
+    public static final String PATH_SETUP = "/setup";
 
     public static final String EXTRA_INTENT_URI = "intentUri";
     public static final String EXTRA_EXTENSION_COMPONENT = "extension_component";
 
+    public static final String KEY_ARTWORK_ASSET = "artwork_asset";
+
     public static final String ACTION_DISMISS = "com.androidzeitgeist.dashwatch.notification.DISMISS";
-
-
 }
