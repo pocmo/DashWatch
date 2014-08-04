@@ -183,24 +183,12 @@ public class WatchFace extends Activity {
         if (extension == null || !extension.isVisible()) {
             statusView.setVisibility(View.GONE);
             iconView.setVisibility(View.GONE);
-
-            Log.d(TAG, "hide: " + (extension != null ? extension.getComponent() : "null"));
         } else {
             statusView.setVisibility(View.VISIBLE);
             iconView.setVisibility(View.VISIBLE);
 
-            statusView.setClickable(true);
-            statusView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(WatchFace.this, "Hello", Toast.LENGTH_SHORT).show();
-                }
-            });
-
             statusView.setText(extension.getStatus());
             iconView.setImageBitmap(extension.getIcon());
-
-            Log.d(TAG, "show: " + extension.getStatus() + " (" + extension.getComponent() + ")");
         }
     }
 }
