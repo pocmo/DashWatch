@@ -20,12 +20,14 @@ import android.util.Log;
 
 import com.androidzeitgeist.dashwatch.common.ExtensionUpdate;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class StatusManager {
     private static final String TAG = "DashWatch/StatusManager";
+    private static final int NUMBER_OF_RANKED_EXTENSIONS = 3;
 
     private List<ExtensionUpdate> updates;
 
@@ -41,15 +43,31 @@ public class StatusManager {
         }
     }
 
-    // TODO: This should actually rank the extensions by visibility and
-    public synchronized ExtensionUpdate[] getRankedExtensions() {
-        Log.d(TAG, "Available extensions: " + updates.size());
+    public synchronized List<ExtensionUpdate> getRankedExtensions() {
+        Log.i(TAG, String.format("getRankedExtensions(extensions=%d) ", updates.size()));
 
-        return new ExtensionUpdate[] {
-            updates.size() > 0 ? updates.get(0) : null,
-            updates.size() > 1 ? updates.get(1) : null,
-            updates.size() > 2 ? updates.get(2) : null
-        };
+        ArrayList<ExtensionUpdate> rankedExtensions = new ArrayList<ExtensionUpdate>();
+        LinkedList<ExtensionUpdate> extensions = new LinkedList<ExtensionUpdate>(updates);
+
+        for (int i = 0; i < NUMBER_OF_RANKED_EXTENSIONS; i++) {
+            ExtensionUpdate bestExtension = null;
+
+            for (ExtensionUpdate update : extensions) {
+                if ((bestExtension == null || update.getPosition() < bestExtension.getPosition()) && update.isVisible()) {
+                    bestExtension = update;
+                }
+            }
+
+            if (bestExtension != null) {
+                extensions.remove(bestExtension);
+            }
+
+            rankedExtensions.add(bestExtension);
+
+            Log.d(TAG, String.format("Rank #%d: %s", i, (bestExtension == null ? "null" : bestExtension.getTitle())));
+        }
+
+        return rankedExtensions;
     }
 
     private void add(ExtensionUpdate update) {

@@ -36,6 +36,8 @@ import com.androidzeitgeist.dashwatch.event.ArtworkUpdate;
 import com.androidzeitgeist.dashwatch.event.BusProvider;
 import com.squareup.otto.Subscribe;
 
+import java.util.List;
+
 public class WatchFace extends Activity {
     private static final String TAG = "DashWatch/WatchFace";
 
@@ -169,12 +171,12 @@ public class WatchFace extends Activity {
     private void updateExtensionsStatus() {
         Log.i(TAG, "updateExtensionsStatus()");
 
-        ExtensionUpdate[] extensions = mStatusManager.getRankedExtensions();
+        List<ExtensionUpdate> extensions = mStatusManager.getRankedExtensions();
 
         // TODO: This is just a fast and ugly hack. The layout should be more dynamically.
-        updateExtensionView(extensions[0], mStatusViews[0], mIconViews[0]);
-        updateExtensionView(extensions[1], mStatusViews[1], mIconViews[1]);
-        updateExtensionView(extensions[2], mStatusViews[2], mIconViews[2]);
+        updateExtensionView(extensions.get(0), mStatusViews[0], mIconViews[0]);
+        updateExtensionView(extensions.get(1), mStatusViews[1], mIconViews[1]);
+        updateExtensionView(extensions.get(2), mStatusViews[2], mIconViews[2]);
     }
 
     private void updateExtensionView(ExtensionUpdate extension, TextView statusView, ImageView iconView) {
