@@ -132,7 +132,14 @@ public class NotificationUpdateService extends WearableListenerService {
     }
 
     private void buildNotification(ExtensionUpdate update) {
+        NotificationManager notificationManager = ((NotificationManager) getSystemService(NOTIFICATION_SERVICE));
         int id = mStorage.getNotificationId(update);
+
+        if (!update.isVisible()) {
+            Log.d(TAG, "Extension is not visible. Removing possibly existing notification.");
+            notificationManager.cancel(id);
+            return;
+        }
 
         Log.d(TAG, String.format("Building notification for component %s with id %d", update.getComponent(), id));
 
@@ -168,6 +175,6 @@ public class NotificationUpdateService extends WearableListenerService {
         );
         builder.setDeleteIntent(pendingIntent);
 
-        ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(id, builder.build());
+        notificationManager.notify(id, builder.build());
     }
 }
