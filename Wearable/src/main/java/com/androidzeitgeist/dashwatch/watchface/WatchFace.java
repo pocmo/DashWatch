@@ -202,8 +202,16 @@ public class WatchFace extends Activity {
             statusView.setVisibility(View.VISIBLE);
             iconView.setVisibility(View.VISIBLE);
 
-            statusView.setText(extension.getStatus());
+            String status = extension.getStatus();
+
+            statusView.setText(status);
             iconView.setImageBitmap(extension.getIcon());
+
+            if (status.length() >= 4) {
+                statusView.setTextSize(14);
+            } else {
+                statusView.setTextSize(18);
+            }
         }
     }
 }
