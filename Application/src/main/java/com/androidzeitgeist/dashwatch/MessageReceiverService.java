@@ -32,16 +32,6 @@ import java.net.URISyntaxException;
 public class MessageReceiverService extends WearableListenerService {
     private static final String TAG = "MessageReceiverService";
 
-    private SourceManager mSourceManager;
-    private ExtensionManager mExtensionManager;
-    private WearableManager mWearableManager;
-
-    public MessageReceiverService() {
-        mSourceManager = SourceManager.getInstance(this);
-        mExtensionManager = ExtensionManager.getInstance(this);
-        mWearableManager = WearableManager.getInstance(this);
-    }
-
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         Log.i(TAG, String.format("onMessageReceived(): %s", messageEvent.getPath()));
@@ -72,7 +62,9 @@ public class MessageReceiverService extends WearableListenerService {
     private void setupWatchFace() {
         Log.i(TAG, "setupWatchFace()");
 
-        mWearableManager.sendExtensionDataToWearable();
-        mWearableManager.sendArtworkToWearable();
+        WearableManager wearableManager = WearableManager.getInstance(this);
+
+        wearableManager.sendExtensionDataToWearable();
+        wearableManager.sendArtworkToWearable();
     }
 }
