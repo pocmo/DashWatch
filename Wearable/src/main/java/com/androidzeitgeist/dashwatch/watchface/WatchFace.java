@@ -28,7 +28,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.androidzeitgeist.dashwatch.NodeManager;
 import com.androidzeitgeist.dashwatch.R;
@@ -170,7 +169,7 @@ public class WatchFace extends Activity {
             DateUtils.formatDateTime(
                 this,
                 System.currentTimeMillis(),
-                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY
+                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_ALL
             )
         );
 
