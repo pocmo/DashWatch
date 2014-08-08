@@ -17,14 +17,14 @@
         android:layout_height="match_parent"
         android:background="#55000000"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="6dp">
 
         <TextView
             android:id="@+id/time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
             android:fontFamily="sans-serif-condensed"
+            android:includeFontPadding="false"
             android:gravity="right"
             android:shadowColor="#000000"
             android:shadowDx="1"
@@ -32,7 +32,7 @@
             android:shadowRadius="3"
             android:text="23:02"
             android:textColor="#ffffff"
-            android:textSize="24sp"
+            android:textSize="32sp"
             android:textStyle="bold" />
 
         <TextView
@@ -40,19 +40,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
+            android:includeFontPadding="false"
             android:gravity="right"
             android:shadowColor="#000000"
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="3"
-            android:text="Monday, July 28"
+            android:text="Fri, Aug 8"
             android:textColor="#ffffff"
-            android:textSize="14sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -60,7 +62,7 @@
                 android:id="@+id/icon1"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginRight="2dp"
+                android:layout_marginRight="3dp"
                 android:visibility="gone" />
 
             <TextView
@@ -79,7 +81,7 @@
                 android:id="@+id/icon2"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginRight="2dp"
+                android:layout_marginRight="3dp"
                 android:visibility="gone" />
 
             <TextView
@@ -92,13 +94,13 @@
                 android:shadowDy="1"
                 android:shadowRadius="2"
                 android:textColor="#ffffff"
-                android:visibility="gone" />
+                android:visibility="visible" />
 
             <ImageView
                 android:id="@+id/icon3"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginRight="2dp"
+                android:layout_marginRight="3dp"
                 android:visibility="gone" />
 
             <TextView
