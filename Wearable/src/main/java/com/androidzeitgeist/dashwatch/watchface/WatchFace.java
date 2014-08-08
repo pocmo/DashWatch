@@ -21,6 +21,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import com.androidzeitgeist.dashwatch.NodeManager;
 import com.androidzeitgeist.dashwatch.R;
+import com.androidzeitgeist.dashwatch.WearableCache;
 import com.androidzeitgeist.dashwatch.common.ExtensionUpdate;
 import com.androidzeitgeist.dashwatch.event.ArtworkUpdate;
 import com.androidzeitgeist.dashwatch.event.BusProvider;
@@ -50,8 +52,10 @@ public class WatchFace extends Activity {
         }
     };
 
-    private ImageView mBackgroundView;
     private StatusManager mStatusManager;
+    private WearableCache mCache;
+
+    private ImageView mBackgroundView;
     private TextView mTimeView;
     private TextView mDateView;
     private TextView[] mStatusViews;
@@ -63,9 +67,12 @@ public class WatchFace extends Activity {
 
         super.onCreate(savedInstanceState);
 
+        mCache = WearableCache.getInstance(this);
+
         setContentView(R.layout.activity_watch_face);
 
         initializeViews();
+        loadArtworkFromCache();
         updateTime();
         registerReceiver();
 
@@ -91,6 +98,14 @@ public class WatchFace extends Activity {
         this.mTimeView = (TextView) findViewById(R.id.time);
         this.mDateView = (TextView) findViewById(R.id.date);
         this.mBackgroundView = (ImageView) findViewById(R.id.background);
+    }
+
+    private void loadArtworkFromCache() {
+        Bitmap bitmap = mCache.fetchArtwork();
+
+        if (bitmap != null) {
+            mBackgroundView.setImageBitmap(bitmap);
+        }
     }
 
     private void registerReceiver() {

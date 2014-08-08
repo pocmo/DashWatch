@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.androidzeitgeist.dashwatch.muzei;
+package com.androidzeitgeist.dashwatch.common;
 
 import android.annotation.TargetApi;
 import android.content.Context;

@@ -20,5 +20,7 @@ android {
 }
 
 dependencies {
+    compile 'com.squareup.okhttp:okhttp:1.2.1'
+
     compile 'com.google.android.gms:play-services:5.0.+@aar'
 }

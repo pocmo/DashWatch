@@ -42,17 +42,18 @@ import com.google.android.gms.wearable.WearableListenerService;
 public class NotificationUpdateService extends WearableListenerService {
     private static final String TAG = "NotificationUpdate";
 
-    private static int REQUEST_CODE_INTENT  = 10000000;
-    private static int REQUEST_CODE_DISMISS = 50000000;
+    private static final int REQUEST_CODE_INTENT  = 10000000;
+    private static final int REQUEST_CODE_DISMISS = 50000000;
 
-    private GoogleApiClient mGoogleApiClient;
     private ExtensionDataStorage mStorage;
+    private WearableCache mCache;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         mStorage = new ExtensionDataStorage(this);
+        mCache = WearableCache.getInstance(this);
     }
 
     @Override
@@ -128,7 +129,12 @@ public class NotificationUpdateService extends WearableListenerService {
 
         Bitmap bitmap = AssetHelper.loadBitmapFromAsset(this, dataMap.getAsset(Constants.KEY_ARTWORK_ASSET));
 
-        BusProvider.postOnMainThread(new ArtworkUpdate(bitmap));
+        if (bitmap != null) {
+            mCache.putArtwork(bitmap);
+            BusProvider.postOnMainThread(new ArtworkUpdate(bitmap));
+        } else {
+            Log.w(TAG, "Bitmap could not be loaded from asset");
+        }
     }
 
     private void buildNotification(ExtensionUpdate update) {

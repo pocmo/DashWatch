@@ -200,8 +200,6 @@ public class WearableManager {
                     public void onResult(DataApi.DataItemResult dataItemResult) {
                         if (!dataItemResult.getStatus().isSuccess()) {
                             Log.e(TAG, "Failed to set the data - status: " + dataItemResult.getStatus().getStatusCode());
-                        } else {
-                            Log.d(TAG, "Success");
                         }
                     }
                 });
