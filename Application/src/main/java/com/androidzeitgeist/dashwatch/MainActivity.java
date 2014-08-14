@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
             Log.d(TAG, "Source: " + listing.title + " (" + listing.componentName + ")");
 
             // TODO: I like space pictures *hack*
-            if (listing.title.contains("Nasa")) {
+            if (listing.title.contains("Featured")) {
                 source = listing;
             }
         }
