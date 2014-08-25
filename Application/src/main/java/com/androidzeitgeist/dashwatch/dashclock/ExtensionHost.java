@@ -146,7 +146,7 @@ public class ExtensionHost {
     }
 
     public static boolean supportsProtocolVersion(int protocolVersion) {
-        return protocolVersion >= 0 && protocolVersion <= CURRENT_EXTENSION_PROTOCOL_VERSION;
+        return protocolVersion > 0 && protocolVersion <= CURRENT_EXTENSION_PROTOCOL_VERSION;
     }
 
     public void destroy() {
