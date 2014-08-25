@@ -320,7 +320,7 @@ public class ExtensionManager {
             listing.title = resolveInfo.loadLabel(pm).toString();
             Bundle metaData = resolveInfo.serviceInfo.metaData;
             if (metaData != null) {
-                listing.protocolVersion = metaData.getInt("protoc   olVersion");
+                listing.protocolVersion = metaData.getInt("protocolVersion");
                 listing.worldReadable = metaData.getBoolean("worldReadable", false);
                 listing.description = metaData.getString("description");
                 String settingsActivity = metaData.getString("settingsActivity");
